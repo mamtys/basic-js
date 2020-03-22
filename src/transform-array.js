@@ -1,19 +1,36 @@
 module.exports = function transform(arr) {
-    if (!Array.isArray(arr)){
+    if (!Array.isArray(arr)) {
         throw new Error();
     }
 
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i] in TRANSFORMATION_TABLE) {
-            TRANSFORMATION_TABLE[arr[i]](arr, i)
-        }
-    }
-    return arr;
-};
+    let result = [];
 
-const TRANSFORMATION_TABLE = {
-    '--discard-next': (arr, ind)  => arr.splice(ind, 2),
-    '--discard-prev': (arr, ind)  => arr.splice(ind - 1 > 0 ? ind - 1 : ind , 2),
-    '--double-next': (arr, ind)  => arr.splice(ind, 1, arr[ind+1]),
-    '--double-prev': (arr, ind)  =>arr.splice(ind, 1, arr[ind-1]),
-}
+    for (let i = 0; i < arr.length; i++) {
+        switch (arr[i]) {
+            case '--double-next':
+                if (i < arr.length - 1) {
+                    result.push(arr[i + 1]);
+                }
+                break;
+
+            case '--discard-prev':
+                result.pop();
+                break;
+
+            case '--discard-next':
+                i++;
+                break;
+
+            case '--double-prev':
+                if (i > 1) {
+                    result.push(arr[i - 1]);
+                }
+                break;
+
+            default:
+                result.push(arr[i]);
+        };
+    };
+
+    return result;
+};
